@@ -1,20 +1,40 @@
+const usersCollection = require("../db").collection("users");
 const validator = require("validator");
 //import isAlphanumeric from "./../node_modules/validator/es/lib/isAlphanumeric";
+const isAlphanumeric = require("is-alphanumeric");
 
 let User = function(data) {
     this.data = data;
     this.errors = [];
 };
+
+User.prototype.cleanUp = function() {
+    if (typeof this.data.username != "string") {
+        this.data.username = "";
+    }
+    if (typeof this.data.email != "string") {
+        this.data.email = "";
+    }
+    if (typeof this.data.password != "string") {
+        this.data.password = "";
+    }
+    //get rid of any bogous properties
+    this.data = {
+        username: this.data.username.trim().toLowerCase(),
+        email: this.data.email.trim().toLowerCase(),
+        password: this.data.password,
+    };
+};
 User.prototype.validate = function() {
     if (this.data.username == "") {
         this.errors.push("You must provide a username");
     }
-    // if (
-    //     this.data.username != "" &&
-    //     validator.isAlphanumeric(this.data.username)
-    // ) {
-    //     this.errors.push("Username can only contain numbers and letters");
-    // }
+    if (
+        this.data.username != "" &&
+        !validator.isAlphanumeric(this.data.username)
+    ) {
+        this.errors.push("Username can only contain numbers and letters");
+    }
     if (!validator.isEmail(this.data.email)) {
         this.errors.push("You must provide a valid email address");
     }
@@ -37,8 +57,12 @@ User.prototype.validate = function() {
 
 User.prototype.register = function() {
     //validate user data
+    this.cleanUp();
     this.validate();
 
-    //only if no validation errors then save the user data
+    //only if no validation errors then save the user data in the database
+    if (!this.errors.length) {
+        usersCollection.insertOne(this.data);
+    }
 };
 module.exports = User;
