@@ -2,8 +2,7 @@ const usersCollection = require("../db").collection("users");
 const validator = require("validator");
 //import isAlphanumeric from "./../node_modules/validator/es/lib/isAlphanumeric";
 const isAlphanumeric = require("is-alphanumeric");
-
-let User = function(data) {
+User = function(data) {
     this.data = data;
     this.errors = [];
 };
