@@ -1,3 +1,6 @@
+//saves user login details to the database 
+
+
 const mongodb = require("mongodb").MongoClient;
 
 const connectionString =
